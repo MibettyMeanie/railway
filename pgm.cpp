@@ -3,31 +3,31 @@ using namespace std;
 
 
 class Details{
-public:
+
 	string name;
 	int age;
 	char gender;
 	string berth_pref;
-
-	void get_details(Details&Passen){
+public:
+	void get_details(){
 		cout<<"Enter name - ";
-		getline(cin,Passen.name);
+		getline(cin,name);
 		cout<<"Enter Age - ";
-		cin>>Passen.age;
+		cin>>age;
 		cout<<"Enter gender(M/F) - ";
-		cin>>Passen.gender;
+		cin>>gender;
 		cout<<"Enter berth preference(Lower/Middle/Upper) - ";
 		cin.get();
-		getline(cin,Passen.berth_pref);
+		getline(cin,berth_pref);
 		cout<<endl;
 
 	}
 
-	void show_details(Details&Passen){
-		cout<<"Name: "<<Passen.name<<" "<<endl;
-		cout<<"Age: "<<Passen.age<<" "<<endl;
-		cout<<"Gender: "<<Passen.gender<<" "<<endl;
-		cout<<"Berth preference: "<<Passen.berth_pref<<endl;
+	void show_details(){
+		cout<<"Name: "<<name<<" "<<endl;
+		cout<<"Age: "<<age<<" "<<endl;
+		cout<<"Gender: "<<gender<<" "<<endl;
+		cout<<"Berth preference: "<<berth_pref<<endl;
 		cout<<endl;
 
 	}
@@ -45,7 +45,7 @@ public:
 		
 		for(int i=count+1;i<n+count+1;i++){
 			cout<<"Enter details of Passenger "<<i+1<<endl;
-			Passen[i].get_details(Passen[i]);
+			Passen[i].get_details();
 		}
 		count+=n;
 	}
@@ -55,7 +55,7 @@ public:
 		for(int i=0;i<count+1;i++){
 			cout<<"Details of Passenger "<<i+1<<endl;
 			cout<<endl;
-			Passen[i].show_details(Passen[i]);	
+			Passen[i].show_details();	
 		}
 	}
 };
