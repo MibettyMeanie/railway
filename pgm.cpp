@@ -2,73 +2,75 @@
 using namespace std;
 
 
-
-class railway{
-
-	int count;
-
-	struct details{
-		string name;
-		int age;
-		char gender;
-		string berth_pref;
-	}Passen[100];
-
-	
+class Details{
 public:
-	railway(){
+	string name;
+	int age;
+	char gender;
+	string berth_pref;
+
+	void get_details(Details&Passen){
+		cout<<"Enter name - ";
+		getline(cin,Passen.name);
+		cout<<"Enter Age - ";
+		cin>>Passen.age;
+		cout<<"Enter gender(M/F) - ";
+		cin>>Passen.gender;
+		cout<<"Enter berth preference(Lower/Middle/Upper) - ";
+		cin.get();
+		getline(cin,Passen.berth_pref);
+		cout<<endl;
+
+	}
+
+	void show_details(Details&Passen){
+		cout<<"Name: "<<Passen.name<<" "<<endl;
+		cout<<"Age: "<<Passen.age<<" "<<endl;
+		cout<<"Gender: "<<Passen.gender<<" "<<endl;
+		cout<<"Berth preference: "<<Passen.berth_pref<<endl;
+		cout<<endl;
+
+	}
+
+};
+
+class Railway{
+	int count;
+	Details Passen[100];	
+public:
+	Railway(){
 		count=-1;
 	}
-	void get_details(int n){
-		cin.get();
+	void book(int n){
+		
 		for(int i=count+1;i<n+count+1;i++){
 			cout<<"Enter details of Passenger "<<i+1<<endl;
-			cout<<endl;
-			cout<<"Enter name - ";
-			getline(cin,Passen[i].name);
-			cout<<"Enter Age - ";
-			cin>>Passen[i].age;
-			cout<<"Enter gender(M/F) - ";
-			cin>>Passen[i].gender;
-			cout<<"Enter berth preference(Lower/Middle/Upper) - ";
-			cin.get();
-			getline(cin,Passen[i].berth_pref);
-			cout<<endl;
-			
+			Passen[i].get_details(Passen[i]);
 		}
 		count+=n;
 	}
 
-	void show_details(){
+	void print(){
 
 		for(int i=0;i<count+1;i++){
 			cout<<"Details of Passenger "<<i+1<<endl;
 			cout<<endl;
-			cout<<"Name: "<<Passen[i].name<<" "<<endl;
-			cout<<"Age: "<<Passen[i].age<<" "<<endl;
-			cout<<"Gender: "<<Passen[i].gender<<" "<<endl;
-			cout<<"Berth preference: "<<Passen[i].berth_pref<<endl;
-			cout<<endl;
-
+			Passen[i].show_details(Passen[i]);	
 		}
 	}
-
-	
-
-
-
 };
 
 
 int main(){
 
 	int n;
-	railway R;
+	Railway R;
 	cout<<"Enter the no: of tickets - ";
 	cin>>n;
+	cin.get();
 	cout<<endl;
-	R.get_details(n);
-	R.show_details();
+	R.book(n);
+	R.print();
 	return 0;
 
 
