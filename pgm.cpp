@@ -1,4 +1,5 @@
 #include<iostream>
+#include<fstream>
 using namespace std;
 
 
@@ -10,6 +11,8 @@ class Details{
 	string berth_pref;
 public:
 	void get_details(){
+		fstream file_obj;
+		file_obj.open("Railway.rtf",ios::binary|ios::out|ios::app);
 		cout<<"Enter name - ";
 		getline(cin,name);
 		cout<<"Enter Age - ";
@@ -20,14 +23,19 @@ public:
 		cin.get();
 		getline(cin,berth_pref);
 		cout<<endl;
-
+		file_obj.write((char*)this, sizeof(*this)); 
 	}
 
 	void show_details(){
-		cout<<"Name: "<<name<<" "<<endl;
-		cout<<"Age: "<<age<<" "<<endl;
-		cout<<"Gender: "<<gender<<" "<<endl;
-		cout<<"Berth preference: "<<berth_pref<<endl;
+		fstream file_obj;
+		Details obj;
+		file_obj.open("Railway.rtf",ios::binary|ios::in);
+		file_obj.read((char*)&obj, sizeof(obj)); 
+
+		cout<<"Name: "<<obj.name<<" "<<endl;
+		cout<<"Age: "<<obj.age<<" "<<endl;
+		cout<<"Gender: "<<obj.gender<<" "<<endl;
+		cout<<"Berth preference: "<<obj.berth_pref<<endl;
 		cout<<endl;
 
 	}
