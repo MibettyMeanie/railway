@@ -10,6 +10,7 @@ class Details{
 	char gender;
 	string berth_pref;
 public:
+	Details *next;
 	void get_details(){
 
 		
@@ -36,21 +37,71 @@ public:
 	}
 
 };
-int main(){
 
-	int n,x;
-	Details D[100];
-	fstream file_obj,to_write;
-	file_obj.open("Railway_sys.rtf",ios::binary|ios::in);
-	int counter=-1;
-	while(!file_obj.eof()){
+class Railway{
 
-		file_obj.read((char*)&D[counter], sizeof(D[counter])); 
-		counter++;
-
+	int count;
+	Details passenger[100];
+	fstream file_obj;	
+public:
+	Railway(){
+		count=0;
+	}
+	void book(){
+		int n;
+		cout<<"Enter the number of tickets you want to book - ";
+		cin>>n;
+		cin.get();
+		for(int i=0;i<n;i++){
+			cout<<"Enter details of Passenger "<<i+1<<endl;
+			passenger[i+count].get_details();
+		}
+		count+=n;
 	}
 
+	void print(){
 
+		for(int i=0;i<count;i++){
+			cout<<"Details of Passenger "<<i+1<<endl;
+			cout<<endl;
+			passenger[i].show_details();	
+		}
+	}
+
+	void read_file(){
+		fstream file_obj;
+	 	file_obj.open("Railway_sys.txt",ios::binary|ios::in);
+	 	if(!file_obj.is_open()){
+	 		cout<<"File not found"<<endl;
+	 		}else{
+	 		while(!file_obj.eof()){
+				if(file_obj.read((char*) & passenger[count], sizeof(passenger[count]))){
+					count++;
+				}else{
+					break;
+				}
+			
+			}
+			file_obj.close();
+		}
+	}
+
+	void save_file(){
+
+		file_obj.open("Railway_sys.txt",ios::binary|ios::out|ios::trunc);
+		for(int i=0;i<count;i++){
+			file_obj.write((char*) & passenger[i], sizeof(passenger[i]));
+		}
+		file_obj.close();
+
+
+	}
+};
+int main(){
+
+	int n;
+	Railway R;
+	R.read_file();
 	do{
 
 		cout<<"Enter 1 to book ticket"<<endl;
@@ -61,35 +112,16 @@ int main(){
 		switch(n){
 
 			case 1: 
-				cout<<"Enter the number of tickets you want to book - ";
-				cin>>x;
-				cin.get();
-				for(int i=counter;i<x+counter;i++){
-					cout<<"Enter details of Passenger "<<endl;
-					D[i].get_details();
-				}
-				counter+=x;
+				R.book();
 				break;
 
 			case 2:
-				for(int i=0;i<counter;i++){
-					cout<<"Details of Passenger "<<i+1<<endl;
-					D[i].show_details();
-				}
+				
+				R.print();				
 				break;
 
 			case 3:
-
-				to_write.open("Railway_sys.rtf",ios::binary|ios::out|ios::app);
-				for(int i=0;i<counter;i++){
-					Details P= D[counter];
-					to_write.write((char*)&P, sizeof(P));
-
-				}
-				char y= 'p';
-				to_write>>y;
-				to_write.close();
-				file_obj.close();
+				R.save_file();
 				return 0;
 
 		}
