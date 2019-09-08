@@ -9,6 +9,8 @@ class Details{
 	int age;
 	char gender;
 	string berth_pref;
+	int pnr;
+
 public:
 	Details *next;
 	void get_details(){
@@ -24,6 +26,9 @@ public:
 		cin.get();
 		getline(cin,berth_pref);
 		cout<<endl;
+		static int pnr=0;
+		this->pnr=++pnr;
+
 	}
 
 	void show_details(){
@@ -32,6 +37,7 @@ public:
 		cout<<"Age: "<<age<<" "<<endl;
 		cout<<"Gender: "<<gender<<" "<<endl;
 		cout<<"Berth preference: "<<berth_pref<<endl;
+		cout<<"PNR no: "<<pnr<<endl;
 		cout<<endl;	
 
 	}
@@ -41,31 +47,41 @@ public:
 class Railway{
 
 	int count;
-	Details passenger[100];
+	Details *front ;
+	Details *rear ;
 	fstream file_obj;	
 public:
 	Railway(){
+		front=NULL;
+		rear=NULL;
 		count=0;
 	}
+
 	void book(){
 		int n;
 		cout<<"Enter the number of tickets you want to book - ";
 		cin>>n;
 		cin.get();
 		for(int i=0;i<n;i++){
+			count++;
 			cout<<"Enter details of Passenger "<<i+1<<endl;
-			passenger[i+count].get_details();
+			Details *temp= new Details();
+			temp->get_details();
+			if(front==NULL&&rear==NULL){
+				front = rear= temp;
+			}else{
+				rear->next=temp;
+				rear=temp;
+			}
 		}
-		count+=n;
 	}
 
 	void print(){
-
-		for(int i=0;i<count;i++){
-			cout<<"Details of Passenger "<<i+1<<endl;
-			cout<<endl;
-			passenger[i].show_details();	
-		}
+		Details *temp=front;
+		while(temp!=NULL){
+			temp->show_details();
+			temp=temp->next;
+		}		
 	}
 
 	void read_file(){
@@ -73,9 +89,21 @@ public:
 	 	file_obj.open("Railway_sys.txt",ios::binary|ios::in);
 	 	if(!file_obj.is_open()){
 	 		cout<<"File not found"<<endl;
-	 		}else{
+	 	}else{
 	 		while(!file_obj.eof()){
-				if(file_obj.read((char*) & passenger[count], sizeof(passenger[count]))){
+	 			if(front==NULL&&rear==NULL){
+	 				Details *temp=new Details();
+	 				if(file_obj.read((char*) temp, sizeof(*temp))){
+	 					front = rear = temp;
+						count++;
+					}else{
+						break;
+					}
+	 			}
+	 			Details *temp=new Details();
+				if(file_obj.read((char*) temp, sizeof(*temp))){	
+					rear->next=temp;
+					rear=temp;	
 					count++;
 				}else{
 					break;
@@ -87,14 +115,14 @@ public:
 	}
 
 	void save_file(){
-
 		file_obj.open("Railway_sys.txt",ios::binary|ios::out|ios::trunc);
-		for(int i=0;i<count;i++){
-			file_obj.write((char*) & passenger[i], sizeof(passenger[i]));
+
+		Details *temp=front;
+		while(temp!=NULL){
+			file_obj.write((char*) temp, sizeof(*temp));
+			temp=temp->next;
 		}
 		file_obj.close();
-
-
 	}
 };
 int main(){
