@@ -8,16 +8,26 @@ static int wl_count=0;
 
 class Details{
 
-	string name;
-	int age;
+	
 	char gender;
-	string berth_pref;
+	
+	
 		
 public:
+	Details(){
+		consider='N';
+	}
+	string berth_pref;
+	int done;
+	int age;
+	string berth_alloted;
+	string name;
+	char consider;
+	char type;
 	Details *next;
 	int pnr;
 	string status;
-	void get_details(int pnr,int count){
+	void get_details(int pnr=0){
 
 		cout<<"Enter name - ";
 		getline(cin,name);
@@ -25,12 +35,16 @@ public:
 		cin>>age;
 		cout<<"Enter gender(M/F) - ";
 		cin>>gender;
-		cout<<"Enter berth preference(Lower/Middle/Upper) - ";
+		if(gender=='F'){
+			cout<<"Do you have any child (age less than 5) with you? (Y/N)"<<endl;
+			cin>>this->consider;
+		}
+		cout<<"Enter berth preference(LB/MB/UB/SUB) - ";
 		cin.get();
 		getline(cin,berth_pref);
 		cout<<endl;
 		this->pnr=pnr;
-		if(cnf_count<4){
+		if(cnf_count<14){
 			this->status="CNF";
 			cnf_count++;
 		}else if(rac_count<4){
@@ -40,7 +54,6 @@ public:
 			this->status="WL";
 			wl_count++;
 		}
-
 	}
 
 	void show_details(){
@@ -74,18 +87,28 @@ public:
 
 	void book(){
 		int n;
+		char ch;
 		cout<<"Enter the number of tickets you want to book - ";
 		cin>>n;
 		cin.get();
 		for(int i=0;i<n;i++){
-			pnr++;
-			count++;
-			if(count<=10){
+			if(count<20){
 				cout<<"Enter details of Passenger "<<i+1<<endl;
+				cout<<"Are you an adult or a child(A/C)"<<endl;
+				cin>>ch;
+				cin.get();
 				Details *temp= new Details();
-				temp->get_details(pnr,count);
-				cout<<"Your PNR is "<<temp->pnr<<endl;
-				cout<<"Status: "<<temp->status<<endl;
+				if(ch=='A'){
+					pnr++;
+					count++;
+					temp->get_details(pnr);
+					temp->type='A';
+					cout<<"Your PNR is "<<temp->pnr<<endl;
+					cout<<"Status: "<<temp->status<<endl;
+				}else{
+					temp->type='C';
+					temp->get_details();
+				}
 				cout<<endl;
 				if(front==NULL&&rear==NULL){
 					front = rear= temp;
@@ -176,34 +199,43 @@ public:
 		int x;
 		cout<<"Enter your PNR no"<<endl;
 		cin>>x;
-		Details *temp=front;
-		if(temp->pnr==x){
-			front=temp->next;
-			string temp_status= temp->status;
-			delete temp;
-			cout<<"Ticket successfully cancelled"<<endl;
-			count--;
-			reassign(temp_status);
-			cout<<endl;
-			return 0;
-		}
-		while(temp->next!=NULL){
-			if((temp->next)->pnr==x){
-				Details *temp2= temp->next;
-				temp->next= temp2->next;
-				string temp_status= temp2->status;
-				delete temp2;
+		if(x>0){
+			Details *temp=front;
+			if(temp->pnr==x){
+				front=temp->next;
+				string temp_status= temp->status;
+				delete temp;
 				cout<<"Ticket successfully cancelled"<<endl;
 				count--;
 				reassign(temp_status);
 				cout<<endl;
 				return 0;
 			}
-			temp=temp->next;
-		}
-		cout<<"INVALID PNR"<<endl;
-		cout<<endl;
-		return 0;
+			while(temp->next!=NULL){
+				if((temp->next)->pnr==x){
+					Details *temp2= temp->next;
+					temp->next= temp2->next;
+					string temp_status= temp2->status;
+					if(temp2==rear){
+						rear= temp;
+					}
+					delete temp2;
+					cout<<"Ticket successfully cancelled"<<endl;
+					count--;
+					reassign(temp_status);
+					cout<<endl;
+					return 0;
+				}
+				temp=temp->next;
+			}
+			cout<<"INVALID PNR"<<endl;
+			cout<<endl;
+			return 0;
+		}else{
+			cout<<"INVALID PNR"<<endl;
+			cout<<endl;
+			return 0;
+		}	
 	}
 
 	void reassign(string status){
@@ -251,6 +283,73 @@ public:
 			wl_count--;
 		}
 	}
+
+	void prep_chart(){
+		Details *temp=front;
+		int lb=4;
+		int mb=4;
+		int ub=4;
+		int sub=2;
+		while(temp!=NULL){
+			if(temp->status=="CNF"){
+				if((temp->age>60&&lb>0)||(temp->consider=='Y'&&lb>0)){
+					temp->berth_alloted="Lower Berth";
+					temp->done=1;
+					lb--;
+				}
+			temp=temp->next;
+			}
+		}
+		while(temp!=NULL){
+			if(temp->status=="CNF"&&temp->done!=1){
+				if(temp->berth_pref=="LB"&&lb>0){
+					temp->berth_alloted="Lower Berth";
+					lb--;
+					temp->done=1;
+				}else if(temp->berth_pref=="MB"&&mb>0){
+					temp->berth_alloted="Middle Berth";
+					mb--;
+					temp->done=1;
+				}else if(temp->berth_pref=="UB"&&ub>0){
+					temp->berth_alloted="Upper Berth";
+					ub--;
+					temp->done=1;
+				}else if(temp->berth_pref=="SUB"&&sub>0){
+					temp->berth_alloted="Side Upper Berth";
+					sub--;
+					temp->done=1;
+				}
+			}else if(temp->status=="RAC"){
+				temp->berth_alloted="Side Lower Berth";
+			}else if(temp->status=="WL"){
+				temp->berth_alloted="NA";
+			}
+		}
+		while(temp!=NULL){
+			if(temp->status=="CNF"&&temp->done!=1){
+				if(lb!=0){
+					temp->berth_alloted="Lower Berth";
+					lb--;
+				}else if(mb!=0){
+					temp->berth_alloted="Middle Berth";
+					mb--;
+				}else if(ub!=0){
+					temp->berth_alloted="Upper Berth";
+					ub--;
+				}else if(sub!=0){
+					temp->berth_alloted="Side Upper Berth";
+					sub--;
+				}
+			}else if(temp->type=='C'){
+				temp->berth_alloted="NA";
+			}
+		}
+		Details *temp2=front;
+		while(temp2!=NULL){
+			cout<<temp2->name<<": "<<temp2->berth_alloted<<endl;
+			temp2=temp2->next;
+		}	
+	}
 };
 int main(){
 
@@ -262,7 +361,8 @@ int main(){
 		cout<<"Enter 1 to book ticket"<<endl;
 		cout<<"Enter 2 to cancel ticket"<<endl;
 		cout<<"Enter 3 to show all booked tickets"<<endl;
-		cout<<"Enter 4 to exit"<<endl;
+		cout<<"Enter 4 to see tentative chart"<<endl;
+		cout<<"Enter 5 to exit"<<endl;
 		cout<<"Enter your option: ";
 		cin>>n;
 		cout<<endl;
@@ -281,6 +381,10 @@ int main(){
 				break;
 
 			case 4:
+				R.prep_chart();				
+				break;
+
+			case 5:
 				R.save_file();
 				return 0;
 
