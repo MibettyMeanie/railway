@@ -2,17 +2,10 @@
 #include<fstream>
 using namespace std;
 
-static int cnf_count=0;
-static int rac_count=0;
-static int wl_count=0;
+
 
 class Details{
-
-	
-	char gender;
-	
-	
-		
+	char gender;		
 public:
 	Details(){
 		consider='N';
@@ -37,23 +30,15 @@ public:
 		cin>>gender;
 		if(gender=='F'){
 			cout<<"Do you have any child (age less than 5) with you? (Y/N)"<<endl;
-			cin>>this->consider;
+			cin>>consider;
 		}
 		cout<<"Enter berth preference(LB/MB/UB/SUB) - ";
 		cin.get();
 		getline(cin,berth_pref);
 		cout<<endl;
 		this->pnr=pnr;
-		if(cnf_count<14){
-			this->status="CNF";
-			cnf_count++;
-		}else if(rac_count<4){
-			this->status="RAC";
-			rac_count++;
-		}else if(wl_count<2){
-			this->status="WL";
-			wl_count++;
-		}
+		
+
 	}
 
 	void show_details(){
@@ -64,6 +49,8 @@ public:
 		cout<<"Berth preference: "<<berth_pref<<endl;
 		cout<<"PNR no: "<<pnr<<endl;
 		cout<<"Status "<<status<<endl;
+		cout<<"berth_alloted"<<berth_alloted<<endl;
+		cout<<"done"<<done<<endl;
 		cout<<endl;	
 
 	}
@@ -76,13 +63,35 @@ class Railway{
 	int pnr;
 	Details *front ;
 	Details *rear ;
-	fstream file_obj;	
+	fstream file_obj;
+	int cnf_count;
+	int rac_count;
+	int wl_count;	
 public:
 	Railway(){
 		front=NULL;
 		rear=NULL;
 		count=0;
 		pnr=0;
+		cnf_count=0;
+		rac_count=0;
+		wl_count=0;
+	}
+
+	string status(){
+
+		if(cnf_count<14){
+			cnf_count++;
+			return "CNF";
+		}else if(rac_count<4){
+			rac_count++;
+			return "RAC";
+		}else if(wl_count<2){
+			wl_count++;
+			return "WL";
+		}else{
+			return NULL;
+		}
 	}
 
 	void book(){
@@ -104,6 +113,7 @@ public:
 					temp->get_details(pnr);
 					temp->type='A';
 					cout<<"Your PNR is "<<temp->pnr<<endl;
+					temp->status= status();
 					cout<<"Status: "<<temp->status<<endl;
 				}else{
 					temp->type='C';
@@ -300,6 +310,7 @@ public:
 			temp=temp->next;
 			}
 		}
+		temp=front;
 		while(temp!=NULL){
 			if(temp->status=="CNF"&&temp->done!=1){
 				if(temp->berth_pref=="LB"&&lb>0){
@@ -324,7 +335,9 @@ public:
 			}else if(temp->status=="WL"){
 				temp->berth_alloted="NA";
 			}
+			temp=temp->next;
 		}
+		temp=front;
 		while(temp!=NULL){
 			if(temp->status=="CNF"&&temp->done!=1){
 				if(lb!=0){
@@ -343,6 +356,7 @@ public:
 			}else if(temp->type=='C'){
 				temp->berth_alloted="NA";
 			}
+			temp=temp->next;
 		}
 		Details *temp2=front;
 		while(temp2!=NULL){
